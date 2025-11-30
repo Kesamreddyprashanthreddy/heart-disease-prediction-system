@@ -1,0 +1,3 @@
+Model,Accuracy,CV_Score
+random_forest,0.9,0.8109929078014184
+xgboost,0.8833333333333333,0.8068262411347519
