@@ -135,10 +135,8 @@ def validate_target_column(df: pd.DataFrame, target_col: str) -> str:
     
     target = df[target_col]
     
-    # Check if it's numerical
     if pd.api.types.is_numeric_dtype(target):
         unique_values = target.nunique()
-        # If less than 10 unique values and all integers, consider classification
         if unique_values <= 10 and target.dtype in ['int64', 'int32']:
             return 'classification'
         else:
@@ -163,31 +161,24 @@ def create_sample_dataset(filepath: str, n_samples: int = 500) -> None:
         'employment_type': np.random.choice(['Full-time', 'Part-time', 'Self-employed', 'Unemployed'], n_samples)
     }
     
-    # Create target variable (loan approval) based on some logic
     df = pd.DataFrame(data)
     df['loan_approved'] = (
         (df['income'] > 40000) & 
         (df['credit_score'] > 650) & 
         (df['employment_type'].isin(['Full-time', 'Self-employed']))
     ).astype(int)
-    
-    # Add some missing values randomly
     missing_cols = ['income', 'credit_score', 'education_years']
     for col in missing_cols:
         missing_idx = np.random.choice(df.index, size=int(0.05 * len(df)), replace=False)
         df.loc[missing_idx, col] = np.nan
     
-    # Add some duplicates
     duplicate_rows = df.sample(n=int(0.02 * len(df)))
     df = pd.concat([df, duplicate_rows], ignore_index=True)
-    
-    # Save the dataset
     ensure_directory(os.path.dirname(filepath))
     df.to_csv(filepath, index=False)
     print(f"Sample dataset created with {len(df)} rows and saved to {filepath}")
 
 
 if __name__ == "__main__":
-    # Create sample dataset for testing
     sample_path = "../data/raw/sample_data.csv"
     create_sample_dataset(sample_path)
